@@ -104,6 +104,10 @@ int main()
 		{
 			std::cout << "INVALID INPUT\n";
 		}
+		else if (userInput.length() < 3)
+		{
+			std::cout << "INVALID INPUT\n";
+		}
 		else if (userInput.at(0) == 't')
 		{
 			std::string currentState = "";
@@ -113,6 +117,88 @@ int main()
 			char moveDir;
 
 			int part = 0;
+			bool valid = true;
+
+			//Validate input
+			if (userInput.at(1) != ' ' || userInput.at(2) == ' ')
+			{
+				valid = false;
+			}
+
+			for (int i = 3; i < userInput.length(); i++)
+			{
+				if (userInput.at(i) == ' ')
+				{
+					if (part == 1)
+					{
+						valid = false;
+						break;
+					}
+					if (part == 3)
+					{
+						valid = false;
+						break;
+					}
+					if (part == 5)
+					{
+						valid = false;
+						break;
+					}
+					if (part == 8)
+					{
+						valid = false;
+						break;
+					}
+					else
+					{
+						part++;
+					}
+				}
+				else if (part == 1)
+				{
+					part++;
+				}
+				else if (part == 2)
+				{
+					valid = false;
+					break;
+				}
+				else if (part == 3)
+				{
+					part++;
+				}
+				else if (part == 5)
+				{
+					part++;
+				}
+				else if (part == 6)
+				{
+					valid = false;
+					break;
+				}
+				else if (part == 7)
+				{
+					if (userInput.at(i) != 'L' && userInput.at(i) != 'l' && userInput.at(i) != 'R' && userInput.at(i) != 'r')
+					{
+						valid = false;
+						break;
+					}
+					part++;
+				}
+				else if (part == 8)
+				{
+					valid = false;
+					break;
+				}
+			}
+
+			if (!valid || part!=8)
+			{
+				std::cout << "INVALID INSTRUCTION INPUT\n";
+				continue;
+			}
+
+			part = 0;
 
 			//Parse the input
 			//Ignore the t and the first space
@@ -157,7 +243,9 @@ int main()
 				//Not found so create the state
 				if ((i+1) == myStates.size())
 				{
-					myStates.push_back(new State(currentState));
+					State* tempState = new State(currentState);
+					tempState->addTransition(inputSym, nextState, writeSymbol, moveDir);
+					myStates.push_back(tempState);
 					break;
 				}
 			}
@@ -181,6 +269,12 @@ int main()
 		else if(userInput.at(0) == 'f')
 		{
 			std::string stateName = "";
+
+			if (userInput.at(1) != ' ')
+			{
+				std::cout << "INVALID FINAL STATE INPUT FORMAT\n";
+				continue;
+			}
 
 			//Make all the given states final
 			for (int i = 2; i < userInput.length(); i++)
@@ -221,6 +315,18 @@ int main()
 		}
 		else if (userInput.at(0) == 'i')
 		{
+			if (userInput.length() < 3)
+			{
+				std::cout << "INCOMPLETE INPUT\n";
+				continue;
+			}
+
+			if (userInput.at(1) != ' ')
+			{
+				std::cout << "INVALID INPUT FORMAT\n";
+				continue;
+			}
+
 			//Reset the machine
 			focusState = startState;
 			int location = 2;
@@ -244,11 +350,11 @@ int main()
 
 				//Move the head
 				userInput.at(location) = writeSymbol;
-				if (moveDirection == 'R')
+				if (moveDirection == 'R' || moveDirection == 'r')
 				{
 					location++;
 				}
-				if (moveDirection == 'L')
+				if (moveDirection == 'L' || moveDirection == 'l')
 				{
 					location--;
 				}
